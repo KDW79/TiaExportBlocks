@@ -66,6 +66,7 @@ namespace TiaExportBlocks
             }
 
         }
+
         private static void ExportAllTagTables(PlcSoftware plcSoftware)
         {
             PlcTagTableSystemGroup plcTagTableSystemGroup = plcSoftware.TagTableGroup;
@@ -111,23 +112,41 @@ namespace TiaExportBlocks
                     HandleType(type, software);
                 }
             }
-            //foreach (PlcType plcType in software.TypeGroup.Types)
-            //{
-            //    Console.WriteLine("Handling type " + plcType.Name);
-            //    HandleType(plcType, software);
-            //}
         }
         private static void ExportTagTables(PlcTagTableComposition tagTables)
         {
             foreach (PlcTagTable table in tagTables)
             {
-                string filePath = exportLocation + @"\tag_tables\xml\"+table.Name + ".xml";
+                string tableName = table.Name;
+                // 태그 명에 특수한 기호가 있는 경우 파일로 옮길 때 에러가 날 수 있으므로 특수기호를 0-9, A-z, .,_ 만 허용하고 나머지는 삭제하여 에러 방지
+                tableName = RemoveSpecialCharacters(tableName);
+                //string filePath = exportLocation + @"\tag_tables\xml\"+ table.Name + ".xml";
+
+                string filePath = exportLocation + @"\tag_tables\xml\" + tableName + ".xml";
                 var fileInfo = new FileInfo(filePath);
                 Console.WriteLine(table.Name+" to "+ fileInfo.FullName);
                 if (File.Exists(fileInfo.FullName)) File.Delete(fileInfo.FullName);
                 table.Export(fileInfo, ExportOptions.WithDefaults);
             }
         }
+
+        // 특수 문자 제거용 펑션
+        public static string RemoveSpecialCharacters(string str)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < str.Length; i++)
+            {
+                if ((str[i] >= '0' && str[i] <= '9')
+                    || (str[i] >= 'A' && str[i] <= 'z'
+                        || (str[i] == '.' || str[i] == '_')))
+                {
+                    sb.Append(str[i]);
+                }
+            }
+
+            return sb.ToString();
+        }
+
         private static void ExportUserGroupDeep(PlcTagTableUserGroup group)
         {
             ExportTagTables(group.TagTables);
