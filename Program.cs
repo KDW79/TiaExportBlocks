@@ -96,11 +96,25 @@ namespace TiaExportBlocks
         }
         private static void ExportTypes(PlcSoftware software)
         {
-            foreach (PlcType plcType in software.TypeGroup.Types)
+            string name = software.Name;
+            Console.WriteLine(name);
+            foreach (PlcType type in software.TypeGroup.Types)
             {
-                Console.WriteLine("Handling type " + plcType.Name);
-                HandleType(plcType, software);
+                HandleType(type, software);
             }
+            foreach (PlcTypeGroup typeGroup in software.TypeGroup.Groups)
+            {
+                Console.WriteLine("Handling type group " + typeGroup.Name);
+                foreach (PlcType type in typeGroup.Types)
+                {
+                    HandleType(type, software);
+                }
+            }
+            //foreach (PlcType plcType in software.TypeGroup.Types)
+            //{
+            //    Console.WriteLine("Handling type " + plcType.Name);
+            //    HandleType(plcType, software);
+            //}
         }
         private static void ExportTagTables(PlcTagTableComposition tagTables)
         {
