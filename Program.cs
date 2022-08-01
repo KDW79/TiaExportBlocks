@@ -57,6 +57,7 @@ namespace TiaExportBlocks
             try
             {
                 if (File.Exists(fileInfo.FullName)) File.Delete(fileInfo.FullName);
+                Console.WriteLine(plcType.Name + " to " + fileInfo.FullName);
                 externalSourceGroup.GenerateSource(blocks, fileInfo, GenerateOptions.None);
             }
             catch (Exception exc)
@@ -274,6 +275,18 @@ namespace TiaExportBlocks
                                             ExportAllTagTables(software);
                                         }
                                     }
+                                    else if (deviceItem.Name.Contains("ASSY"))
+                                    {
+                                        Console.WriteLine("Handling PLC device item");
+                                        Siemens.Engineering.HW.Features.SoftwareContainer softwareContainer = ((IEngineeringServiceProvider)deviceItem).GetService<SoftwareContainer>();
+                                        if (softwareContainer != null)
+                                        {
+                                            PlcSoftware software = softwareContainer.Software as PlcSoftware;
+                                            ExportBlocks(software);
+                                            ExportTypes(software);
+                                            ExportAllTagTables(software);
+                                        }
+                                    }
                                 }
                             }
                             else
@@ -302,7 +315,7 @@ namespace TiaExportBlocks
                 watch.Stop();
                 Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
                 Console.WriteLine("Done");
-                //Console.ReadLine();
+                Console.ReadLine();
                 return;
             }
         }
